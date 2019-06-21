@@ -13,22 +13,19 @@ import akka.routing.Routee;
 import akka.routing.Router;
 import br.ufrn.messages.CosAggregateData;
 import br.ufrn.messages.CosData;
-import br.ufrn.messages.ModData;
 import br.ufrn.messages.PrevUserData;
 import br.ufrn.messages.UserData;
 import br.ufrn.messages.UserPairData;
-import br.ufrn.messages.requests.CosAggregateRequest;
-import br.ufrn.messages.requests.PrevDataRequest;
+import br.ufrn.requests.CosAggregateRequest;
+import br.ufrn.requests.PrevDataRequest;
 
 public class MasterActor extends AbstractActor {
-	private ActorRef modActor = getContext().actorOf(ModActor.props(), "mod");
 	private ActorRef prevUserDataActor = getContext().actorOf(PrevUserDataActor.props(), "prev_user_data");
 	private ActorRef cosAggregateActor = getContext().actorOf(CosAggregateActor.props(), "cos_aggregate");
 	private UserData newUserData;
-	private double newUserMod;
 	private final int numberOfRoutees = 10;// TODO: config this
-	private int maxArtists = 10; // TODO: make actor for this
-	private int userCount = 10; // TODO: make actor for this
+	private int maxArtists = 10; // TODO: make an actor for this
+	private int userCount = 10; // TODO: make an actor for this
 
 	Router cosRouter;
 	{
@@ -49,10 +46,6 @@ public class MasterActor extends AbstractActor {
 		return receiveBuilder()
 				.match(UserData.class, msg -> {
 					newUserData = new UserData(msg);
-					modActor.tell(msg, getSelf());
-				})
-				.match(ModData.class, msg -> {
-					newUserMod = msg.getData();
 					prevUserDataActor.tell(new PrevDataRequest(), getSelf());
 				})
 				.match(PrevUserData.class, msg -> {
@@ -66,29 +59,28 @@ public class MasterActor extends AbstractActor {
 					}
 				})
 				.match(CosAggregateData.class, msg -> {
-					printMean(msg);
+					printCosAggregateData(msg);
 				})
 				.build();
 		
 	}
 	
 	private void applyRoutes(PrevUserData msg) {
-		for(Integer userTwo : msg.getUserList()) {
-			Map<Integer, Double> interestsUserTwo = msg.getInterests().get(userTwo);
-			Double userTwoMod = msg.getMods().get(userTwo);
-			
-			if(interestsUserTwo != null) {
-				UserPairData pairData = new UserPairData(newUserData.getUser(), userTwo, newUserData.getUserData(), 
-						interestsUserTwo, newUserMod, userTwoMod, maxArtists);
-				cosRouter.route(pairData, getSelf());
-			}
+		int otherUser;
+		for(Map.Entry<Integer, Map<Integer, Double>> interest : msg.getInterests().entrySet()) {
+			otherUser = interest.getKey();
+			Map<Integer, Double> interestsOtherUser = interest.getValue();
+	
+			UserPairData pairData = new UserPairData(newUserData.getUser(), otherUser, 
+					newUserData.getUserData(), 
+					interestsOtherUser, maxArtists);
+			cosRouter.route(pairData, getSelf());
 		}
 	}
 	
-	private void printMean(CosAggregateData msg) {
-		for(int user : msg.getClosestUsers()) {
-			System.out.println(user);
-		}
+	private void printCosAggregateData(CosAggregateData data) {
+		for(int i : data.getClosestUsers())
+			System.out.println(i);
 	}
 
 	public static Props props() {

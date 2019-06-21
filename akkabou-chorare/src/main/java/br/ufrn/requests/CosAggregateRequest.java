@@ -1,4 +1,4 @@
-package br.ufrn.messages.requests;
+package br.ufrn.requests;
 
 public class CosAggregateRequest {
 

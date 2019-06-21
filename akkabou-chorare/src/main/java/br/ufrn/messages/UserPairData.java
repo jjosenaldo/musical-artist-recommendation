@@ -7,18 +7,14 @@ public class UserPairData {
 	private int userTwo;
 	private Map<Integer, Double> userTwoData;
 	private Map<Integer, Double> userOneData;
-	private double userOneMod;
-	private double userTwoMod;
-	private int maxRepos;
+	private int maxArtists;
 
-	public UserPairData(int userOne, int userTwo, Map<Integer, Double> userOneData, Map<Integer, Double> userTwoData, double userOneMod, double userTwoMod, int maxRepos) {
+	public UserPairData(int userOne, int userTwo, Map<Integer, Double> userOneData, Map<Integer, Double> userTwoData, int maxArtists) {
 		this.userOne = userOne;
 		this.userTwo = userTwo;
 		this.userOneData = userOneData;
 		this.userTwoData = userTwoData;
-		this.userOneMod = userOneMod;
-		this.userTwoMod = userTwoMod;
-		this.maxRepos = maxRepos;
+		this.maxArtists = maxArtists;
 	}
 	
 	public int getUserOne() {
@@ -37,15 +33,7 @@ public class UserPairData {
 		return userTwoData;
 	}
 	
-	public double getUserOneMod() {
-		return userOneMod;
-	}
-	
-	public double getUserTwoMod() {
-		return userTwoMod;
-	}
-	
-	public int getMaxRepos() {
-		return maxRepos;
+	public int getMaxArtists() {
+		return maxArtists;
 	}
 }

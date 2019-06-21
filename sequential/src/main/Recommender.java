@@ -50,9 +50,6 @@ public class Recommender {
 					break;
 				}
 			}
-			
-			System.out.print(closestUsers[0] + " " + closestUsers[1] + " " + closestUsers[2]);
-			System.out.println(": " + closestValues[0] + " " + closestValues[1] + " " + closestValues[2]);
 		}
 		
 		return closestUsers;

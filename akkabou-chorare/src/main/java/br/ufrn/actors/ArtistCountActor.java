@@ -3,7 +3,7 @@ package br.ufrn.actors;
 import akka.actor.AbstractActor;
 import akka.actor.Props;
 import br.ufrn.messages.ArtistCount;
-import br.ufrn.messages.requests.ArtistCountRequest;
+import br.ufrn.requests.ArtistCountRequest;
 
 public class ArtistCountActor extends AbstractActor{
 	// TODO

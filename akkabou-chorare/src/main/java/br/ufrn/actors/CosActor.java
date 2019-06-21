@@ -21,24 +21,24 @@ public class CosActor extends AbstractActor{
 	private CosData calculateCos(UserPairData data) {
 		Map<Integer, Double> userOneData = data.getUserOneData();
 		Map<Integer, Double> userTwoData = data.getUserTwoData();
-		double userOneMod = data.getUserOneMod();
-		double userTwoMod = data.getUserTwoMod();
-		int maxRepos = data.getMaxRepos();
 		Double userOneInterest, userTwoInterest;
 		double dotProduct = 0;
 		
-		for(int i = 0; i < maxRepos; ++i) {
-			userOneInterest = userOneData.get(i);
-			userTwoInterest = userTwoData.get(i);
+		// You only need to check the interests of one of the users, since the artists
+		// whom the other user listens to that this user doesn't listen to contributes 
+		// with 0 to the inner product of the two vectors.
+		for(Map.Entry<Integer, Double> interestsUserOne : userOneData.entrySet()) {
+			userOneInterest = interestsUserOne.getValue();
+			userTwoInterest = userTwoData.get(interestsUserOne.getKey());
 			
-			if(userOneInterest != null && userTwoInterest != null) {
+			if(userTwoInterest != null) {
 				dotProduct += userOneInterest * userTwoInterest;
 			}
 		}
 		
-		double result = Math.min(1.0, dotProduct / userOneMod / userTwoMod); 
+		dotProduct = Math.min(1.0, dotProduct); 
 		
-		return new CosData(data.getUserOne(), data.getUserTwo(), result);
+		return new CosData(data.getUserOne(), data.getUserTwo(), dotProduct);
 	}
 	
 	public static Props props () {
