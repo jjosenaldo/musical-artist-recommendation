@@ -10,6 +10,8 @@ public class Main {
 		newInterests.put(520, 0.3);
 		newInterests.put(540, 0.4);
 		Recommender rec = new Recommender();
-		rec.recommend(newInterests);
+		for(int i : rec.recommend(newInterests)) {
+			System.out.println(i);
+		}
 	}
 }
