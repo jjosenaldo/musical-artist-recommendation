@@ -1,10 +1,10 @@
 package br.ufrn.messages;
 
-public class CosAggregateData {
+public class ClosestUsersData {
 	private int user;
 	private int[] closestUsers;
 	
-	public CosAggregateData(int user, int[] closestUsers) {
+	public ClosestUsersData(int user, int[] closestUsers) {
 		this.user = user;
 		this.closestUsers = closestUsers;
 	}

@@ -7,14 +7,12 @@ public class UserPairData {
 	private int userTwo;
 	private Map<Integer, Double> userTwoData;
 	private Map<Integer, Double> userOneData;
-	private int maxArtists;
 
-	public UserPairData(int userOne, int userTwo, Map<Integer, Double> userOneData, Map<Integer, Double> userTwoData, int maxArtists) {
+	public UserPairData(int userOne, int userTwo, Map<Integer, Double> userOneData, Map<Integer, Double> userTwoData) {
 		this.userOne = userOne;
 		this.userTwo = userTwo;
 		this.userOneData = userOneData;
 		this.userTwoData = userTwoData;
-		this.maxArtists = maxArtists;
 	}
 	
 	public int getUserOne() {
@@ -31,9 +29,5 @@ public class UserPairData {
 	
 	public Map<Integer, Double> getUserTwoData(){
 		return userTwoData;
-	}
-	
-	public int getMaxArtists() {
-		return maxArtists;
 	}
 }

@@ -2,7 +2,7 @@ package br.ufrn.actors;
 
 import akka.actor.AbstractActor;
 import akka.actor.Props;
-import br.ufrn.messages.CosAggregateData;
+import br.ufrn.messages.ClosestUsersData;
 import br.ufrn.messages.CosData;
 import br.ufrn.requests.CosAggregateRequest;
 
@@ -29,7 +29,7 @@ public class CosAggregateActor extends AbstractActor{
 						updateBest(msg);
 					}
 				)
-				.match(CosAggregateRequest.class, msg -> getSender().tell(new CosAggregateData(user, closestUsers), getSelf()))
+				.match(CosAggregateRequest.class, msg -> getSender().tell(new ClosestUsersData(user, closestUsers), getSelf()))
 				.build();
 	}
 	
