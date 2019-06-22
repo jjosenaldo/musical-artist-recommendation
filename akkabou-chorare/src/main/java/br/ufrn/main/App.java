@@ -8,6 +8,7 @@ import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import br.ufrn.actors.MasterActor;
+import br.ufrn.messages.BestRecommendationsData;
 import br.ufrn.messages.UserData;
 import br.ufrn.requests.ResultRequest;
 import scala.concurrent.Await;
@@ -36,15 +37,18 @@ public class App
         master.tell(new UserData(5000, newInterests), master);
         
         try {
-			Thread.sleep(1000);
+			Thread.sleep(5000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
         
         Future<Object> future = Patterns.ask(master, new ResultRequest(),timeout );
         try {
-			String result = (String) Await.result(future, Duration.create("5 seconds"));
-			System.out.println(result);
+			BestRecommendationsData result = (BestRecommendationsData) Await.result(future, Duration.create("5 seconds"));
+
+			for(int i : result.getBestRecommendations())
+				System.out.println(i);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

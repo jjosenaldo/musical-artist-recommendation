@@ -40,6 +40,6 @@ public class ArtistRecommendationAggregateActor extends AbstractActor{
 	}
 	
 	public static Props props () {
-		return Props.create(CosAggregateActor.class);
+		return Props.create(ArtistRecommendationAggregateActor.class);
 	}
 }

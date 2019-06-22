@@ -9,27 +9,32 @@ import java.util.Set;
 import akka.actor.AbstractActor;
 import akka.actor.Props;
 import br.ufrn.messages.AllRecommendationsWithFilterNumberData;
-import br.ufrn.messages.FilteredRecommendationsData;
+import br.ufrn.messages.BestRecommendationsData;
+import br.ufrn.requests.ResultRequest;
 
 public class KBestRecommendationsActor extends AbstractActor {
+	private List<Integer> bestRecommendations;
+	
 	@Override
 	public Receive createReceive() {
 		return receiveBuilder()
 				.match(AllRecommendationsWithFilterNumberData.class, msg -> {
-					getSender().tell(new FilteredRecommendationsData(kBestRecommendations(msg))
-							, getSelf());  
+					kBestRecommendations(msg);  
+				})
+				.match(ResultRequest.class, msg -> {
+					getSender().tell(new BestRecommendationsData(bestRecommendations), getSelf());
 				})
 				.build();
 	}
 	
-	private List<Integer> kBestRecommendations(AllRecommendationsWithFilterNumberData recs){
+	private void kBestRecommendations(AllRecommendationsWithFilterNumberData recs){
 		Map<Integer, Double> map = recs.getRecommendations();
 		int k = recs.getK();
 		Set<Map.Entry<Integer, Double>> entries = map.entrySet();
 		int setSize = entries.size();
 		List<Map.Entry<Integer, Double>> listOfEntries = new ArrayList<>(setSize);
 		listOfEntries.addAll(entries);
-		List<Integer> res = new ArrayList<>(k);
+		bestRecommendations = new ArrayList<>(k);
 		
 		for(int i = 0; i < k; ++i) {
 			for(int j = 0; j < setSize-1; ++j) {
@@ -37,10 +42,8 @@ public class KBestRecommendationsActor extends AbstractActor {
 					Collections.swap(listOfEntries, j, j+1);
 				}
 			}
-			res.add( listOfEntries.get(setSize - i - 1).getKey()  );
-		}
-		
-		return res;
+			bestRecommendations.add( listOfEntries.get(setSize - i - 1).getKey()  );
+		} 
 	}
 	
 	public static Props props() {

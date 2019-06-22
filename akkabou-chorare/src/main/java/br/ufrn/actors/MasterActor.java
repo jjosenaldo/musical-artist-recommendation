@@ -15,7 +15,6 @@ import br.ufrn.messages.AllRecommendationsData;
 import br.ufrn.messages.AllRecommendationsWithFilterNumberData;
 import br.ufrn.messages.ClosestUsersData;
 import br.ufrn.messages.CosData;
-import br.ufrn.messages.FilteredRecommendationsData;
 import br.ufrn.messages.InterestsOfOldUsersPlusNewData;
 import br.ufrn.messages.PrevUserData;
 import br.ufrn.messages.SingleUserTasteData;
@@ -24,6 +23,7 @@ import br.ufrn.messages.UserPairData;
 import br.ufrn.requests.ArtistRecommendationAggregateRequest;
 import br.ufrn.requests.CosAggregateRequest;
 import br.ufrn.requests.PrevDataRequest;
+import br.ufrn.requests.ResultRequest;
 
 public class MasterActor extends AbstractActor {
 	private ActorRef prevUserDataActor = getContext().actorOf(PrevUserDataActor.props(), "prev_user_data");
@@ -40,8 +40,7 @@ public class MasterActor extends AbstractActor {
 	
 	// Needs to be smaller than closestUsersParam
 	private final int numberOfArtistRecommendationRouteesParam = 3;
-	private int userCount = 100; // TODO: make an actor for this
-	
+	private int userCount = 10; // TODO: make an actor for this
 
 	Router cosRouter;
 	{
@@ -64,7 +63,7 @@ public class MasterActor extends AbstractActor {
 			routees.add(new ActorRefRoutee(r));
 		}
 		
-		cosRouter = new Router(new RoundRobinRoutingLogic(), routees);
+		artistRecommendationRouter = new Router(new RoundRobinRoutingLogic(), routees);
 	}
 
 	@Override
@@ -87,6 +86,7 @@ public class MasterActor extends AbstractActor {
 					}
 				})
 				.match(ClosestUsersData.class, msg -> {
+					
 					applyArtistRecommendationRoutes(msg);
 				})
 				.match(SingleUserTasteData.class, msg ->{
@@ -101,7 +101,7 @@ public class MasterActor extends AbstractActor {
 							new AllRecommendationsWithFilterNumberData(msg.getRecommendations(), kParam),
 							getSelf());
 				})
-				.match(FilteredRecommendationsData.class, msg -> {
+				.match(ResultRequest.class, msg -> {
 					bestRecommendationsActor.forward(msg, getContext());
 				})
 				.build();
