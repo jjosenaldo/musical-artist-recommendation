@@ -36,15 +36,11 @@ public class MasterActor extends AbstractActor {
 	private InitMessage newUserData;
 	private PrevUserData prevUserData;
 	
-	private final int numberOfCosRouteesParam = 100;
-	// TODO: change this
+	private final int numberOfCosRouteesParam = 100; // TODO
 	private int closestUsersParam; 
-	private int kParam;
-	
-	// Needs to be <= than closestUsersParam
+	private int kParam;	
 	private int numberOfArtistRecommendationRouteesParam;
-	
-	private int userCount = 100; // TODO: make an actor for this
+	private int userCountParam = 100; // TODO: make an actor for this
 
 	private Router cosRouter;
 	private Router artistRecommendationRouter;
@@ -67,7 +63,7 @@ public class MasterActor extends AbstractActor {
 				.match(CosData.class, msg -> {
 					cosAggregateActor.tell(msg, getSelf());
 					
-					if(--userCount == 0) {
+					if(--userCountParam == 0) {
 						cosAggregateActor.tell(new CosAggregateRequest(), getSelf());
 					}
 				})

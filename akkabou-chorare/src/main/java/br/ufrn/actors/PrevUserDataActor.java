@@ -11,7 +11,6 @@ public class PrevUserDataActor extends AbstractActor{
 	public Receive createReceive() {	
 		return receiveBuilder()
 				.match(PrevDataRequest.class, msg -> {
-					// TODO: change this
 					getSender().tell(new PrevUserData(IOUtils.getInterests()), getSelf());  
 				})
 				.build();

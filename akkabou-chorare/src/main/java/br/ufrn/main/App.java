@@ -31,7 +31,6 @@ public class App
         newInterests.put(500, 0.3);
 		newInterests.put(520, 0.3);
 		newInterests.put(540, 0.4);
-
         
         Future<Object> future = Patterns.ask(master, new InitMessage(5000, newInterests, 8, 2),timeout );
         try {
