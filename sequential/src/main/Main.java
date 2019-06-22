@@ -9,7 +9,7 @@ public class Main {
 		newInterests.put(500, 0.3);
 		newInterests.put(520, 0.3);
 		newInterests.put(540, 0.4);
-		Recommender rec = new Recommender();
+		Recommender rec = new Recommender(5, 10);
 		for(int i : rec.recommend(newInterests)) {
 			System.out.println(i);
 		}

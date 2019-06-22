@@ -34,13 +34,14 @@ public class MasterActor extends AbstractActor {
 	private UserData newUserData;
 	private PrevUserData prevUserData;
 	
-	private final int numberOfCosRouteesParam = 10;
+	private final int numberOfCosRouteesParam = 100;
 	private int closestUsersParam = 10; 
 	private int kParam = 5;
 	
-	// Needs to be smaller than closestUsersParam
-	private final int numberOfArtistRecommendationRouteesParam = 3;
-	private int userCount = 10; // TODO: make an actor for this
+	// Needs to be <= than closestUsersParam
+	private final int numberOfArtistRecommendationRouteesParam = 10;
+	
+	private int userCount = 100; // TODO: make an actor for this
 
 	Router cosRouter;
 	{

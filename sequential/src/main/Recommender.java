@@ -11,18 +11,22 @@ import utils.IOUtils;
 
 public class Recommender {
 	private Map<Integer, Map<Integer, Double>> interests;
+	private int numRecommendations;
+	private int numClosests;
 	
-	public Recommender() {
+	public Recommender(int numRecommendations, int numClosests) {
+		this.numRecommendations = numRecommendations;
+		this.numClosests = numClosests;
 		interests = IOUtils.getInterests();
 	}
 	
 	public List<Integer> recommend(Map<Integer, Double> newUserInterests) {
-		int[] closest = closestUsers(newUserInterests, 4);
-		return recommendedArtists(closest, 4, newUserInterests);
+		int[] closest = closestUsers(newUserInterests);
+		return recommendedArtists(closest, newUserInterests);
 		
 	}
 	
-	private List<Integer> recommendedArtists(int[] closest, int numRecomendations, Map<Integer, Double> newUserInterests) {
+	private List<Integer> recommendedArtists(int[] closest, Map<Integer, Double> newUserInterests) {
 		Map<Integer, Double> allRecs = new ConcurrentHashMap<>();
 		int artist;
 		double userInterest;
@@ -42,17 +46,17 @@ public class Recommender {
 			}
 		}
 		
-		return kBest(allRecs, numRecomendations);
+		return kBest(allRecs);
 	}
 	
-	private List<Integer> kBest(Map<Integer, Double> map, int k) {
+	private List<Integer> kBest(Map<Integer, Double> map) {
 		Set<Map.Entry<Integer, Double>> entries = map.entrySet();
 		int setSize = entries.size();
 		List<Map.Entry<Integer, Double>> listOfEntries = new ArrayList<>(setSize);
 		listOfEntries.addAll(entries);
-		List<Integer> res = new ArrayList<>(k);
+		List<Integer> res = new ArrayList<>(numRecommendations);
 		
-		for(int i = 0; i < k; ++i) {
+		for(int i = 0; i < numRecommendations; ++i) {
 			for(int j = 0; j < setSize-1; ++j) {
 				if(listOfEntries.get(j).getValue() > listOfEntries.get(j+1).getValue()) {
 					Collections.swap(listOfEntries, j, j+1);
@@ -64,14 +68,14 @@ public class Recommender {
 		return res;
 	}
 	
-	private int[] closestUsers(Map<Integer, Double> newUserInterests, int param) {
-		int[] closestUsers = new int[param];
-		double[] closestValues = new double[param];
+	private int[] closestUsers(Map<Integer, Double> newUserInterests) {
+		int[] closestUsers = new int[numClosests];
+		double[] closestValues = new double[numClosests];
 		double prod;
 		Double like, likeOther;
 		
-		for(int i = 0; i < param; ++i) closestValues[i] = -1;
-		for(int i = 0; i < param; ++i) closestUsers[i] = -1;
+		for(int i = 0; i < numClosests; ++i) closestValues[i] = -1;
+		for(int i = 0; i < numClosests; ++i) closestUsers[i] = -1;
 		
 		for(Map.Entry<Integer, Map<Integer, Double>> e : interests.entrySet()) {
 			prod = 0;
@@ -86,9 +90,9 @@ public class Recommender {
 			
 			prod = Math.min(1.0, prod);
 			
-			for(int i = 0; i < param; ++i) {
+			for(int i = 0; i < numClosests; ++i) {
 				if(prod > closestValues[i]) {
-					for(int j = param-1; j > i; --j) {
+					for(int j = numClosests-1; j > i; --j) {
 						closestValues[j] =closestValues[j-1];
 						closestUsers[j] =closestUsers[j-1];
 					}
