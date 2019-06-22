@@ -16,10 +16,11 @@ import br.ufrn.messages.AllRecommendationsWithFilterNumberData;
 import br.ufrn.messages.BestRecommendationsData;
 import br.ufrn.messages.ClosestUsersData;
 import br.ufrn.messages.CosData;
+import br.ufrn.messages.InitMessage;
 import br.ufrn.messages.InterestsOfOldUsersPlusNewData;
+import br.ufrn.messages.MaxNumberOfClosestsData;
 import br.ufrn.messages.PrevUserData;
 import br.ufrn.messages.SingleUserTasteData;
-import br.ufrn.messages.UserData;
 import br.ufrn.messages.UserPairData;
 import br.ufrn.requests.ArtistRecommendationAggregateRequest;
 import br.ufrn.requests.CosAggregateRequest;
@@ -32,50 +33,31 @@ public class MasterActor extends AbstractActor {
 	private ActorRef bestRecommendationsActor = getContext().actorOf(KBestRecommendationsActor.props(), "best_recommendation");
 	private ActorRef contextActor;
 	
-	private UserData newUserData;
+	private InitMessage newUserData;
 	private PrevUserData prevUserData;
 	
 	private final int numberOfCosRouteesParam = 100;
 	// TODO: change this
-	private int closestUsersParam = 3; 
-	private int kParam = 5;
+	private int closestUsersParam; 
+	private int kParam;
 	
 	// Needs to be <= than closestUsersParam
-	private final int numberOfArtistRecommendationRouteesParam = 3;
+	private int numberOfArtistRecommendationRouteesParam;
 	
 	private int userCount = 100; // TODO: make an actor for this
 
-	Router cosRouter;
-	{
-		List<Routee> routees = new ArrayList<Routee>();
-		for (int i = 0; i < numberOfCosRouteesParam; i++) {
-			ActorRef r = getContext().actorOf(Props.create(CosActor.class));
-			this.getContext().watch(r);
-			routees.add(new ActorRefRoutee(r));
-		}
-
-		cosRouter = new Router(new RoundRobinRoutingLogic(), routees);
-	}
-	
-	Router artistRecommendationRouter;
-	{
-		List<Routee> routees = new ArrayList<Routee>();
-		for (int i = 0; i < numberOfArtistRecommendationRouteesParam; ++i) {
-			ActorRef r = getContext().actorOf(Props.create(ArtistRecommendationActor.class));
-			this.getContext().watch(r);
-			routees.add(new ActorRefRoutee(r));
-		}
-		
-		artistRecommendationRouter = new Router(new RoundRobinRoutingLogic(), routees);
-	}
+	private Router cosRouter;
+	private Router artistRecommendationRouter;
 
 	@Override
 	public Receive createReceive() {
 		
 		return receiveBuilder()
-				.match(UserData.class, msg -> {
+				.match(InitMessage.class, msg -> {
 					contextActor = getSender();
-					newUserData = new UserData(msg);
+					newUserData = new InitMessage(msg);
+					kParam = msg.getMaxRecommendations();
+					cosAggregateActor.tell(new MaxNumberOfClosestsData(msg.getMaxClosestUsers()), getSelf());
 					prevUserDataActor.tell(new PrevDataRequest(), getSelf());
 				})
 				.match(PrevUserData.class, msg -> {
@@ -112,8 +94,35 @@ public class MasterActor extends AbstractActor {
 		
 	}
 	
+	private void initArtistRecommendationRouter() {
+		List<Routee> routees = new ArrayList<Routee>();
+		for (int i = 0; i < numberOfArtistRecommendationRouteesParam; ++i) {
+			ActorRef r = getContext().actorOf(Props.create(ArtistRecommendationActor.class));
+			this.getContext().watch(r);
+			routees.add(new ActorRefRoutee(r));
+		}
+		
+		artistRecommendationRouter = new Router(new RoundRobinRoutingLogic(), routees);
+	}
+	
+	private void initCosRouter() {
+		List<Routee> routees = new ArrayList<Routee>();
+		for (int i = 0; i < numberOfCosRouteesParam; i++) {
+			ActorRef r = getContext().actorOf(Props.create(CosActor.class));
+			this.getContext().watch(r);
+			routees.add(new ActorRefRoutee(r));
+		}
+
+		cosRouter = new Router(new RoundRobinRoutingLogic(), routees);
+	}
+	
 	private void applyArtistRecommendationRoutes(ClosestUsersData data) {
 		List<Integer> closestUsers = data.getClosestUsers();
+		
+		closestUsersParam = closestUsers.size();
+		numberOfArtistRecommendationRouteesParam = closestUsersParam;
+		
+		initArtistRecommendationRouter();
 		
 		for(int closeUser : closestUsers) {
 			artistRecommendationRouter.route(
@@ -124,6 +133,7 @@ public class MasterActor extends AbstractActor {
 	}
 	
 	private void applyCosRoutes(PrevUserData msg) {
+		initCosRouter();
 		int otherUser;
 		for(Map.Entry<Integer, Map<Integer, Double>> interest : msg.getInterests().entrySet()) {
 			otherUser = interest.getKey();

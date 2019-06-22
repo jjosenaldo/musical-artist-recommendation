@@ -9,7 +9,7 @@ import akka.pattern.Patterns;
 import akka.util.Timeout;
 import br.ufrn.actors.MasterActor;
 import br.ufrn.messages.BestRecommendationsData;
-import br.ufrn.messages.UserData;
+import br.ufrn.messages.InitMessage;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -31,14 +31,9 @@ public class App
         newInterests.put(500, 0.3);
 		newInterests.put(520, 0.3);
 		newInterests.put(540, 0.4);
-//        
-//        try {
-//			Thread.sleep(5000);
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		}
+
         
-        Future<Object> future = Patterns.ask(master, new UserData(5000, newInterests),timeout );
+        Future<Object> future = Patterns.ask(master, new InitMessage(5000, newInterests, 8, 2),timeout );
         try {
 			BestRecommendationsData result = (BestRecommendationsData) Await.result(future, Duration.create("5 seconds"));
 

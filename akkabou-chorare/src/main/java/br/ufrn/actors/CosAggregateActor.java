@@ -7,17 +7,18 @@ import akka.actor.AbstractActor;
 import akka.actor.Props;
 import br.ufrn.messages.ClosestUsersData;
 import br.ufrn.messages.CosData;
+import br.ufrn.messages.MaxNumberOfClosestsData;
 import br.ufrn.requests.CosAggregateRequest;
 
 public class CosAggregateActor extends AbstractActor{
 	private int user;
 	private int[] closestUsers;
 	private double[] closestValues;
-	// TODO: this should be in the Master actor
-	private final int numberOfClosestsParam = 10;
+	private int numberOfClosestsParam;
 	
-	public CosAggregateActor() {
-		super();
+	
+	private void initArrays(int size) {
+		numberOfClosestsParam = size;
 		this.closestUsers = new int[numberOfClosestsParam];
 		this.closestValues = new double[numberOfClosestsParam];
 		
@@ -29,6 +30,9 @@ public class CosAggregateActor extends AbstractActor{
 	
 	public Receive createReceive() {
 		return receiveBuilder() 
+				.match(MaxNumberOfClosestsData.class, msg ->{
+					initArrays(msg.getMaxClosests());
+				})
 				.match(CosData.class, msg -> {   
 						updateBest(msg);
 					}
