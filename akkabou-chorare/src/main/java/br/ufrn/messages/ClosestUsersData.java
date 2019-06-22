@@ -1,10 +1,12 @@
 package br.ufrn.messages;
 
+import java.util.List;
+
 public class ClosestUsersData {
 	private int user;
-	private int[] closestUsers;
+	private List<Integer> closestUsers;
 	
-	public ClosestUsersData(int user, int[] closestUsers) {
+	public ClosestUsersData(int user, List<Integer> closestUsers) {
 		this.user = user;
 		this.closestUsers = closestUsers;
 	}
@@ -13,7 +15,7 @@ public class ClosestUsersData {
 		return user;
 	}
 	
-	public int[] getClosestUsers() {
+	public List<Integer> getClosestUsers() {
 		return closestUsers;
 	}
 }

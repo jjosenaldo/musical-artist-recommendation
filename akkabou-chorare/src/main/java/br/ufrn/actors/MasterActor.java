@@ -13,6 +13,7 @@ import akka.routing.Routee;
 import akka.routing.Router;
 import br.ufrn.messages.AllRecommendationsData;
 import br.ufrn.messages.AllRecommendationsWithFilterNumberData;
+import br.ufrn.messages.BestRecommendationsData;
 import br.ufrn.messages.ClosestUsersData;
 import br.ufrn.messages.CosData;
 import br.ufrn.messages.InterestsOfOldUsersPlusNewData;
@@ -23,23 +24,24 @@ import br.ufrn.messages.UserPairData;
 import br.ufrn.requests.ArtistRecommendationAggregateRequest;
 import br.ufrn.requests.CosAggregateRequest;
 import br.ufrn.requests.PrevDataRequest;
-import br.ufrn.requests.ResultRequest;
 
 public class MasterActor extends AbstractActor {
 	private ActorRef prevUserDataActor = getContext().actorOf(PrevUserDataActor.props(), "prev_user_data");
 	private ActorRef cosAggregateActor = getContext().actorOf(CosAggregateActor.props(), "cos_aggregate");
 	private ActorRef artistRecommendationAggregateActor = getContext().actorOf(ArtistRecommendationAggregateActor.props(), "artist_recommendation_aggregate");
 	private ActorRef bestRecommendationsActor = getContext().actorOf(KBestRecommendationsActor.props(), "best_recommendation");
+	private ActorRef contextActor;
 	
 	private UserData newUserData;
 	private PrevUserData prevUserData;
 	
 	private final int numberOfCosRouteesParam = 100;
-	private int closestUsersParam = 10; 
+	// TODO: change this
+	private int closestUsersParam = 3; 
 	private int kParam = 5;
 	
 	// Needs to be <= than closestUsersParam
-	private final int numberOfArtistRecommendationRouteesParam = 10;
+	private final int numberOfArtistRecommendationRouteesParam = 3;
 	
 	private int userCount = 100; // TODO: make an actor for this
 
@@ -72,6 +74,7 @@ public class MasterActor extends AbstractActor {
 		
 		return receiveBuilder()
 				.match(UserData.class, msg -> {
+					contextActor = getSender();
 					newUserData = new UserData(msg);
 					prevUserDataActor.tell(new PrevDataRequest(), getSelf());
 				})
@@ -102,15 +105,15 @@ public class MasterActor extends AbstractActor {
 							new AllRecommendationsWithFilterNumberData(msg.getRecommendations(), kParam),
 							getSelf());
 				})
-				.match(ResultRequest.class, msg -> {
-					bestRecommendationsActor.forward(msg, getContext());
+				.match(BestRecommendationsData.class, msg -> {
+					contextActor.tell(msg, getSelf());
 				})
 				.build();
 		
 	}
 	
 	private void applyArtistRecommendationRoutes(ClosestUsersData data) {
-		int[] closestUsers = data.getClosestUsers();
+		List<Integer> closestUsers = data.getClosestUsers();
 		
 		for(int closeUser : closestUsers) {
 			artistRecommendationRouter.route(

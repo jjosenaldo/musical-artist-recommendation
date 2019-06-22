@@ -10,7 +10,6 @@ import akka.actor.AbstractActor;
 import akka.actor.Props;
 import br.ufrn.messages.AllRecommendationsWithFilterNumberData;
 import br.ufrn.messages.BestRecommendationsData;
-import br.ufrn.requests.ResultRequest;
 
 public class KBestRecommendationsActor extends AbstractActor {
 	private List<Integer> bestRecommendations;
@@ -19,15 +18,12 @@ public class KBestRecommendationsActor extends AbstractActor {
 	public Receive createReceive() {
 		return receiveBuilder()
 				.match(AllRecommendationsWithFilterNumberData.class, msg -> {
-					kBestRecommendations(msg);  
-				})
-				.match(ResultRequest.class, msg -> {
-					getSender().tell(new BestRecommendationsData(bestRecommendations), getSelf());
+					getSender().tell(new BestRecommendationsData(kBestRecommendations(msg)), getSelf());
 				})
 				.build();
 	}
 	
-	private void kBestRecommendations(AllRecommendationsWithFilterNumberData recs){
+	private List<Integer> kBestRecommendations(AllRecommendationsWithFilterNumberData recs){
 		Map<Integer, Double> map = recs.getRecommendations();
 		int k = recs.getK();
 		Set<Map.Entry<Integer, Double>> entries = map.entrySet();
@@ -44,6 +40,8 @@ public class KBestRecommendationsActor extends AbstractActor {
 			}
 			bestRecommendations.add( listOfEntries.get(setSize - i - 1).getKey()  );
 		} 
+		
+		return bestRecommendations;
 	}
 	
 	public static Props props() {
