@@ -25,7 +25,7 @@ public class KBestRecommendationsActor extends AbstractActor {
 	
 	private List<Integer> kBestRecommendations(AllRecommendationsWithFilterNumberData recs){
 		Map<Integer, Double> map = recs.getRecommendations();
-		int k = recs.getK();
+		int k = Math.min(recs.getK(), map.size());
 		Set<Map.Entry<Integer, Double>> entries = map.entrySet();
 		int setSize = entries.size();
 		List<Map.Entry<Integer, Double>> listOfEntries = new ArrayList<>(setSize);

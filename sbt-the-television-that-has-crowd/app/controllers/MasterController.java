@@ -5,6 +5,7 @@ import akka.actor.*;
 import static akka.pattern.Patterns.ask;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import java.util.List;
 import java.util.Map;
 import javax.inject.*;
 import messages.BestRecommendationsData;
@@ -12,6 +13,7 @@ import messages.InitMessage;
 import models.InitMessageModel;
 import play.data.Form;
 import play.data.FormFactory;
+import play.data.validation.ValidationError;
 import play.mvc.*;
 import scala.compat.java8.FutureConverters;
 import scala.concurrent.Await;
@@ -34,8 +36,30 @@ public class MasterController extends Controller{
 
     public Result getRecommendations(Http.Request request){
         // Data sent in form
-        InitMessageModel initMessageModel = initMessageForm.bindFromRequest(request).get();
-        Map<Integer, Double> dataMap = Parser.mapFromString(initMessageModel.getData());
+        // InitMessageModel InitMessageModel = initMessageForm.bindFromRequest(request).get();
+
+        Form<InitMessageModel> form = initMessageForm.bindFromRequest();
+        if (form.hasErrors()) {
+            String errMsg = "";
+            for(ValidationError err : form.allErrors()){
+                errMsg += err.key() + "\n";
+            }
+
+            return badRequest(views.html.detail.render(errMsg));
+        }
+
+
+        InitMessageModel initMessageModel = form.get();
+        Map<Integer, Double> dataMap;
+
+        try {
+            dataMap = Parser.mapFromString(initMessageModel.getData());
+        }
+
+        catch(NumberFormatException e){
+            return badRequest(views.html.detail.render("data"));
+        }
+        
         
         Timeout timeout = new Timeout((FiniteDuration) Duration.create("10 seconds"));
         ActorSystem actorSystem = ActorSystem.create("recommender");

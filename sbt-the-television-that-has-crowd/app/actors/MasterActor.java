@@ -59,13 +59,13 @@ public class MasterActor extends AbstractActor {
 					dbActor.tell(new PrevDataRequest(), getSelf());
 				})
 				.match(PrevUserData.class, msg -> {
-					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ PrevUserData @@@@@@@@@@@@@@@@@@@@@@@@@");
+					// System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ PrevUserData @@@@@@@@@@@@@@@@@@@@@@@@@");
 					prevUserData = msg;
 					dbActor.tell(new CloseDBReuquest(), getSelf());
 					applyCosRoutes(msg);
 				})
 				.match(CosData.class, msg -> {
-					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ CosData @@@@@@@@@@@@@@@@@@@@@@@@@");
+					// System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ CosData @@@@@@@@@@@@@@@@@@@@@@@@@");
 					cosAggregateActor.tell(msg, getSelf());
 					
 					if(--userCountParam == 0) {
@@ -73,12 +73,12 @@ public class MasterActor extends AbstractActor {
 					}
 				})
 				.match(ClosestUsersData.class, msg -> {
-					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ ClosestUsersData @@@@@@@@@@@@@@@@@@@@@@@@@");
+					// System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ ClosestUsersData @@@@@@@@@@@@@@@@@@@@@@@@@");
 					
 					applyArtistRecommendationRoutes(msg);
 				})
 				.match(SingleUserTasteData.class, msg ->{
-					System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ SingleUserTasteData @@@@@@@@@@@@@@@@@@@@@@@@@");
+					// System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ SingleUserTasteData @@@@@@@@@@@@@@@@@@@@@@@@@");
 					artistRecommendationAggregateActor.tell(msg, getSelf());
 					
 					if(--closestUsersParam == 0) {
