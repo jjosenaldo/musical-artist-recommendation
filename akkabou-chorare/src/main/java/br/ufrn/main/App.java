@@ -10,6 +10,8 @@ import akka.util.Timeout;
 import br.ufrn.actors.MasterActor;
 import br.ufrn.messages.BestRecommendationsData;
 import br.ufrn.messages.InitMessage;
+import br.ufrn.messages.NewUserData;
+import br.ufrn.requests.PrevDataRequest;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -32,18 +34,22 @@ public class App
 		newInterests.put(520, 0.3);
 		newInterests.put(540, 0.4);
         
-        Future<Object> future = Patterns.ask(master, new InitMessage(5000, newInterests, 8, 2),timeout );
-        try {
-			BestRecommendationsData result = (BestRecommendationsData) Await.result(future, Duration.create("5 seconds"));
-
-			for(int i : result.getBestRecommendations())
-				System.out.println(i);
-			
-			system.terminate();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//        Future<Object> future = Patterns.ask(master, new InitMessage(5000, newInterests, 8, 2),timeout );
+//        try {
+//			BestRecommendationsData result = (BestRecommendationsData) Await.result(future, Duration.create("5 seconds"));
+//
+//			for(int i : result.getBestRecommendations())
+//				System.out.println(i);
+//			
+//			system.terminate();
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+		
+//		master.tell(new NewUserData(newInterests, 5000), master);
+		master.tell(new PrevDataRequest(), master);
+		//system.terminate();
 
        
     }
