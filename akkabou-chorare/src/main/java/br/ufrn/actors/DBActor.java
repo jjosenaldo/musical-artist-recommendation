@@ -14,6 +14,7 @@ import akka.actor.AbstractActor;
 import akka.actor.Props;
 import br.ufrn.messages.NewUserData;
 import br.ufrn.messages.PrevUserData;
+import br.ufrn.requests.CloseDBReuquest;
 import br.ufrn.requests.PrevDataRequest;
 
 public class DBActor extends AbstractActor{
@@ -81,11 +82,13 @@ public class DBActor extends AbstractActor{
 	public Receive createReceive() {
 		return receiveBuilder()
 				.match(NewUserData.class, msg -> {
-					System.out.println("received ");
 					insertUser(msg);
 				})
 				.match(PrevDataRequest.class, msg -> {
 					getSender().tell(new PrevUserData(getAllUsers()), getSelf());
+				})
+				.match(CloseDBReuquest.class, msg -> {
+					close();
 				})
 				.build();
 	}		

@@ -11,7 +11,7 @@ import br.ufrn.actors.MasterActor;
 import br.ufrn.messages.BestRecommendationsData;
 import br.ufrn.messages.InitMessage;
 import br.ufrn.messages.NewUserData;
-import br.ufrn.requests.PrevDataRequest;
+import br.ufrn.utils.IOUtils;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
@@ -23,9 +23,20 @@ import scala.concurrent.duration.FiniteDuration;
  */
 public class App 
 {
+	public static void insertStuffInCassandra() {
+		ActorSystem system = ActorSystem.create("recommenderSystem");
+		ActorRef master = system.actorOf(MasterActor.props(), "master");
+		Map<Integer, Map<Integer, Double>> data = IOUtils.getInterests();
+		
+		for(Map.Entry<Integer, Map<Integer, Double>> entry : data.entrySet()) {
+			master.tell(new NewUserData(entry.getValue(), entry.getKey()), master);
+		}
+	}
+	
     public static void main( String[] args )
     {
-    	Timeout timeout = new Timeout((FiniteDuration) Duration.create("5 seconds"));
+//    	insertStuffInCassandra();
+    	Timeout timeout = new Timeout((FiniteDuration) Duration.create("10 seconds"));
     	
         ActorSystem system = ActorSystem.create("recommenderSystem");
         ActorRef master = system.actorOf(MasterActor.props(), "master");
@@ -34,22 +45,20 @@ public class App
 		newInterests.put(520, 0.3);
 		newInterests.put(540, 0.4);
         
-//        Future<Object> future = Patterns.ask(master, new InitMessage(5000, newInterests, 8, 2),timeout );
-//        try {
-//			BestRecommendationsData result = (BestRecommendationsData) Await.result(future, Duration.create("5 seconds"));
-//
-//			for(int i : result.getBestRecommendations())
-//				System.out.println(i);
-//			
-//			system.terminate();
-//			
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+        Future<Object> future = Patterns.ask(master, new InitMessage(5000, newInterests, 8, 2),timeout );
+        try {
+			BestRecommendationsData result = (BestRecommendationsData) Await.result(future, Duration.create("10 seconds"));
+
+			for(int i : result.getBestRecommendations())
+				System.out.println(i);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			system.terminate();
+		}
 		
-//		master.tell(new NewUserData(newInterests, 5000), master);
-		master.tell(new PrevDataRequest(), master);
-		//system.terminate();
+		
 
        
     }

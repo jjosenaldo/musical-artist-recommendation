@@ -38,8 +38,6 @@ public class CosAggregateActor extends AbstractActor{
 					}
 				)
 				.match(CosAggregateRequest.class, msg -> {
-					for(int i : closestUsers) System.out.println(i);
-					System.out.println("end");
 					List<Integer> res = new ArrayList<>(closestUsers.length);
 					for(int i : closestUsers) if(i != -1) res.add(i); 
 					getSender().tell(new ClosestUsersData(user, res), getSelf());
