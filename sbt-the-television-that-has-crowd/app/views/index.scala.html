@@ -1,5 +1,5 @@
-@()
-
-@main("pagina inicial do role") {
-  <h1>Welcome to Play!</h1>
+@main("Início"){
+    <form action="@routes.MasterController.index">
+      <input type="submit" value="Give me recommendations!" />
+    </form>
 }

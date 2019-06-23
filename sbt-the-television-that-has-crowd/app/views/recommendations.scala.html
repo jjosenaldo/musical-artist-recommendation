@@ -1,0 +1,12 @@
+@(recommendations: List[Integer])
+
+ 
+@main("Recomendações"){
+    <h1>Artistas recomendados</h3>
+    @for(rec <- recommendations){
+      @rec <br>
+    }
+    <hr>
+
+    <a href="@routes.HomeController.index">Início</a>
+}

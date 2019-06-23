@@ -49,8 +49,7 @@ public class App
         try {
 			BestRecommendationsData result = (BestRecommendationsData) Await.result(future, Duration.create("10 seconds"));
 
-			for(int i : result.getBestRecommendations())
-				System.out.println(i);
+            return ok(views.html.recommendations.render(result.getBestRecommendations()));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -59,7 +58,7 @@ public class App
 		}
 		
 		
-
+        return null;
        
     }
 }

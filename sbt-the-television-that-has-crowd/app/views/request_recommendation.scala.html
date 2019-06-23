@@ -1,0 +1,17 @@
+@import helper._
+@(form : Form[models.InitMessageModel])
+
+@main("Recommend me"){
+    @helper.form(action = routes.MasterController.getRecommendations, 'method -> "get") {
+        @helper.inputText(form("user")) 
+
+        @helper.inputText(form("maxRecommendations")) 
+
+        @helper.inputText(form("maxClosestUsers")) 
+
+        @helper.inputText(form("data")) 
+        <input type='submit' value="Recommend me!" />
+
+
+    }
+}

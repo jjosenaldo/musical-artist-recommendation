@@ -1,10 +1,8 @@
 # Routes
 # This file defines all application routes (Higher priority routes first)
-# ~~~~
 
-# An example controller showing a sample home page
-GET     /                     controllers.HomeController.index
-GET     /hello                controllers.HomeController.sayHello()
 
-# Cassandra stuff
-GET     /requestinfo/*name    controllers.HomeController.requestUser(name)
+
+GET      /                     controllers.HomeController.index  
+GET      /recommend            controllers.MasterController.index
+GET      /recommend/result     controllers.MasterController.getRecommendations(request : Request)
