@@ -29,6 +29,7 @@ public class ArtistRecommendationAggregateActor extends AbstractActor{
 	}
 	
 	private void update(Map<Integer, Double> taste) {
+		// System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ ArtistRecommendationAggregateActor.update @@@@@@@@@@@@@@@@@@@@@@@@@");
 		int artist;
 		Double userInterest;
 		for(Map.Entry<Integer, Double> tasteEntry : taste.entrySet()) {

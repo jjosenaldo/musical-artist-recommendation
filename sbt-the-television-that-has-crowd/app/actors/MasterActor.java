@@ -37,7 +37,8 @@ public class MasterActor extends AbstractActor {
 	
 	private InitMessage newUserData;
 	private PrevUserData prevUserData;
-//	
+
+	private final int maxClosestUsersParam = 10;
 	private final int numberOfCosRouteesParam = 100; // TODO
 	private int closestUsersParam; 
 	private int kParam;	
@@ -55,7 +56,7 @@ public class MasterActor extends AbstractActor {
 					contextActor = getSender();
 					newUserData = new InitMessage(msg);
 					kParam = msg.getMaxRecommendations();
-					cosAggregateActor.tell(new MaxNumberOfClosestsData(msg.getMaxClosestUsers()), getSelf());
+					cosAggregateActor.tell(new MaxNumberOfClosestsData(maxClosestUsersParam), getSelf());
 					dbActor.tell(new PrevDataRequest(), getSelf());
 				})
 				.match(PrevUserData.class, msg -> {
@@ -82,10 +83,12 @@ public class MasterActor extends AbstractActor {
 					artistRecommendationAggregateActor.tell(msg, getSelf());
 					
 					if(--closestUsersParam == 0) {
+						// System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ Aggregate Time @@@@@@@@@@@@@@@@@@@@@@@@@");
 						artistRecommendationAggregateActor.tell(new ArtistRecommendationAggregateRequest(), getSelf());
 					}
 				})
 				.match(AllRecommendationsData.class, msg -> {
+					// System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ AllRecommendationsData @@@@@@@@@@@@@@@@@@@@@@@@@");
 					bestRecommendationsActor.tell(
 							new AllRecommendationsWithFilterNumberData(msg.getRecommendations(), kParam),
 							getSelf());
@@ -142,7 +145,7 @@ public class MasterActor extends AbstractActor {
 			otherUser = interest.getKey();
 			Map<Integer, Double> interestsOtherUser = interest.getValue();
 	
-			UserPairData pairData = new UserPairData(newUserData.getUser(), otherUser, 
+			UserPairData pairData = new UserPairData(otherUser, 
 					newUserData.getUserData(), 
 					interestsOtherUser);
 			cosRouter.route(pairData, getSelf());

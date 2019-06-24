@@ -38,7 +38,7 @@ public class CosActor extends AbstractActor{
 		
 		dotProduct = Math.min(1.0, dotProduct); 
 		
-		return new CosData(data.getUserOne(), data.getUserTwo(), dotProduct);
+		return new CosData(data.getUserTwo(), dotProduct);
 	}
 	
 	public static Props props () {

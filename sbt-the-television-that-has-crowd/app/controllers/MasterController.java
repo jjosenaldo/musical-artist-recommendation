@@ -35,8 +35,6 @@ public class MasterController extends Controller{
     }
 
     public Result getRecommendations(Http.Request request){
-        // Data sent in form
-        // InitMessageModel InitMessageModel = initMessageForm.bindFromRequest(request).get();
 
         Form<InitMessageModel> form = initMessageForm.bindFromRequest();
         if (form.hasErrors()) {
@@ -65,7 +63,7 @@ public class MasterController extends Controller{
         ActorSystem actorSystem = ActorSystem.create("recommender");
         ActorRef masterActor = actorSystem.actorOf(MasterActor.props());
 
-        Future<Object> future = Patterns.ask(masterActor, new InitMessage(initMessageModel.getUser(), dataMap, initMessageModel.getMaxClosestUsers(), initMessageModel.getMaxRecommendations()),timeout );
+        Future<Object> future = Patterns.ask(masterActor, new InitMessage(dataMap, initMessageModel.getMaxRecommendations()),timeout );
         // System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ Created Future object @@@@@@@@@@@@@@@@@@@@@@@@@");
 
         try {
