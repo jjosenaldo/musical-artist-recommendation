@@ -28,7 +28,6 @@ import requests.CosAggregateRequest;
 import requests.PrevDataRequest;
 
 public class MasterActor extends AbstractActor {
-//	private ActorRef prevUserDataActor = getContext().actorOf(PrevUserDataActor.props(), "prev_user_data");
 	private ActorRef cosAggregateActor = getContext().actorOf(CosAggregateActor.props(), "cos_aggregate");
 	private ActorRef artistRecommendationAggregateActor = getContext().actorOf(ArtistRecommendationAggregateActor.props(), "artist_recommendation_aggregate");
 	private ActorRef bestRecommendationsActor = getContext().actorOf(KBestRecommendationsActor.props(), "best_recommendation");
@@ -39,12 +38,13 @@ public class MasterActor extends AbstractActor {
 	private PrevUserData prevUserData;
 
 	private final int maxClosestUsersParam = 10;
-	private final int numberOfCosRouteesParam = 100; // TODO
+	private final int numberOfCosRouteesParam = 10; 
+
 	private int closestUsersParam; 
 	private int kParam;	
 	private int numberOfArtistRecommendationRouteesParam;
-	private int userCountParam = 100; // TODO: make an actor for this
-//
+	private int userCountParam;
+
 	private Router cosRouter;
 	private Router artistRecommendationRouter;
 
@@ -62,6 +62,7 @@ public class MasterActor extends AbstractActor {
 				.match(PrevUserData.class, msg -> {
 					// System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@ PrevUserData @@@@@@@@@@@@@@@@@@@@@@@@@");
 					prevUserData = msg;
+					userCountParam = msg.getInterests().size();
 					dbActor.tell(new CloseDBReuquest(), getSelf());
 					applyCosRoutes(msg);
 				})
@@ -126,7 +127,7 @@ public class MasterActor extends AbstractActor {
 		List<Integer> closestUsers = data.getClosestUsers();
 		
 		closestUsersParam = closestUsers.size();
-		numberOfArtistRecommendationRouteesParam = closestUsersParam;
+		numberOfArtistRecommendationRouteesParam = Math.min(closestUsersParam, maxClosestUsersParam);
 		
 		initArtistRecommendationRouter();
 		
