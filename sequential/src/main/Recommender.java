@@ -21,12 +21,12 @@ public class Recommender {
 	}
 	
 	public List<Integer> recommend(Map<Integer, Double> newUserInterests) {
-		int[] closest = closestUsers(newUserInterests);
+		List<Integer> closest = closestUsers(newUserInterests);
 		return recommendedArtists(closest, newUserInterests);
 		
 	}
 	
-	private List<Integer> recommendedArtists(int[] closest, Map<Integer, Double> newUserInterests) {
+	private List<Integer> recommendedArtists(List<Integer> closest, Map<Integer, Double> newUserInterests) {
 		Map<Integer, Double> allRecs = new ConcurrentHashMap<>();
 		int artist;
 		double userInterest;
@@ -68,7 +68,7 @@ public class Recommender {
 		return res;
 	}
 	
-	private int[] closestUsers(Map<Integer, Double> newUserInterests) {
+	private List<Integer> closestUsers(Map<Integer, Double> newUserInterests) {
 		int[] closestUsers = new int[numClosests];
 		double[] closestValues = new double[numClosests];
 		double prod;
@@ -103,6 +103,13 @@ public class Recommender {
 			}
 		}
 		
-		return closestUsers;
+		List<Integer> res = new ArrayList<Integer>();
+		
+		for(int i : closestUsers) {
+			if(i == -1) break;
+			res.add(i);
+		}
+		
+		return res;
 	}
 }

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class IOUtils {
 	public static Map<Integer, Map<Integer, Double>> getInterests(){
-		String path = "/home/satan/randstuff/my-repos/recommender-system/data/input100.dat";
+		String path = "/home/satan/randstuff/my-repos/crecommender/data/input1891.dat";
 		Integer user, artist;
 		Double interest;
 		Map<Integer, Map<Integer, Double>> res = new ConcurrentHashMap<Integer, Map<Integer,Double>>();
