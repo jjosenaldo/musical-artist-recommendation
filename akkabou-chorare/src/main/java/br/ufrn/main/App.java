@@ -7,6 +7,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
+import br.ufrn.actors.DBActor;
 import br.ufrn.actors.MasterActor;
 import br.ufrn.messages.BestRecommendationsData;
 import br.ufrn.messages.InitMessage;
@@ -25,8 +26,9 @@ public class App
 {
 	public static void insertStuffInCassandra() {
 		ActorSystem system = ActorSystem.create("recommenderSystem");
-		ActorRef master = system.actorOf(MasterActor.props(), "master");
-		Map<Integer, Map<Integer, Double>> data = IOUtils.getInterests();
+		ActorRef master = system.actorOf(DBActor.props(), "db");
+		String path = "/home/satan/randstuff/my-repos/crecommender/data/input1891.dat";
+		Map<Integer, Map<Integer, Double>> data = IOUtils.getInterests(path);
 		
 		for(Map.Entry<Integer, Map<Integer, Double>> entry : data.entrySet()) {
 			master.tell(new NewUserData(entry.getValue(), entry.getKey()), master);
@@ -35,30 +37,28 @@ public class App
 	
     public static void main( String[] args )
     {
-//    	insertStuffInCassandra();
-    	Timeout timeout = new Timeout((FiniteDuration) Duration.create("10 seconds"));
-    	
-        ActorSystem system = ActorSystem.create("recommenderSystem");
-        ActorRef master = system.actorOf(MasterActor.props(), "master");
-        Map<Integer, Double> newInterests = new ConcurrentHashMap<>();
-        newInterests.put(500, 0.3);
-		newInterests.put(520, 0.3);
-		newInterests.put(540, 0.4);
-        
-        Future<Object> future = Patterns.ask(master, new InitMessage(5000, newInterests, 8, 2),timeout );
-        try {
-			BestRecommendationsData result = (BestRecommendationsData) Await.result(future, Duration.create("10 seconds"));
-
-            return ok(views.html.recommendations.render(result.getBestRecommendations()));
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			system.terminate();
-		}
+    	insertStuffInCassandra();
+//    	Timeout timeout = new Timeout((FiniteDuration) Duration.create("10 seconds"));
+//    	
+//        ActorSystem system = ActorSystem.create("recommenderSystem");
+//        ActorRef master = system.actorOf(MasterActor.props(), "master");
+//        Map<Integer, Double> newInterests = new ConcurrentHashMap<>();
+//        newInterests.put(500, 0.3);
+//		newInterests.put(520, 0.3);
+//		newInterests.put(540, 0.4);
+//        
+//        Future<Object> future = Patterns.ask(master, new InitMessage(5000, newInterests, 8, 2),timeout );
+//        try {
+//			BestRecommendationsData result = (BestRecommendationsData) Await.result(future, Duration.create("10 seconds"));
+//			System.out.println(result.getBestRecommendations());
+//            
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			system.terminate();
+//		}
 		
 		
-        return null;
-       
     }
 }
