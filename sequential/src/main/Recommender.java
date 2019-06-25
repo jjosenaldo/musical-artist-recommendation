@@ -12,11 +12,10 @@ import utils.IOUtils;
 public class Recommender {
 	private Map<Integer, Map<Integer, Double>> interests;
 	private int numRecommendations;
-	private int numClosests;
+	private int numClosests = 10;
 	
-	public Recommender(int numRecommendations, int numClosests) {
+	public Recommender(int numRecommendations) {
 		this.numRecommendations = numRecommendations;
-		this.numClosests = numClosests;
 		interests = IOUtils.getInterests();
 	}
 	
